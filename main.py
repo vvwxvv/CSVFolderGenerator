@@ -11,7 +11,6 @@ from PyQt5.QtWidgets import (
     QLabel,
     QMessageBox,
     QFileDialog,
-    QComboBox,
 )
 from PyQt5.QtCore import Qt, QPoint
 from PyQt5.QtGui import QPixmap
@@ -58,7 +57,7 @@ class CSVFolderGeneratorApp(QWidget):
             QPushButton:hover {
                 background-color: #BEE0E8;
             }
-            QLineEdit, QComboBox {
+            QLineEdit {
                 border: 2px solid #ccc;
                 border-radius: 8px;
                 padding: 8px;
@@ -98,20 +97,9 @@ class CSVFolderGeneratorApp(QWidget):
             "Header 2 — column name (optional)", label_style
         )
 
-        # ── Separator picker ─────────────────────────────────────────────
-        sep_row = QHBoxLayout()
-        sep_label = QLabel("Separator:", self)
-        sep_label.setStyleSheet("font-size: 13px; color: black; background: transparent; border: none; margin-left: 10px;")
-        self.sep_combo = QComboBox(self)
-        self.sep_combo.addItems(["_  (underscore)", "-  (dash)", ".  (dot)", "    (space)"])
-        self.sep_combo.setFixedHeight(40)
-        sep_row.addWidget(sep_label)
-        sep_row.addWidget(self.sep_combo)
-        sep_row.setContentsMargins(10, 0, 10, 0)
-
         # ── File / folder pickers ────────────────────────────────────────
-        self.csv_label   = self._create_path_label("No CSV file selected")
-        self.out_label   = self._create_path_label("No output folder selected (defaults to CSV directory)")
+        self.csv_label = self._create_path_label("No CSV file selected")
+        self.out_label = self._create_path_label("No output folder selected (defaults to CSV directory)")
 
         csv_btn = self._create_button("Select CSV File",      self._select_csv_file)
         out_btn = self._create_button("Select Output Folder", self._select_output_folder)
@@ -123,12 +111,12 @@ class CSVFolderGeneratorApp(QWidget):
         for w in (
             self.header1_input,
             self.header2_input,
+            csv_btn,
+            self.csv_label,
+            out_btn,
+            self.out_label,
+            start_btn,
         ):
-            layout.addWidget(w)
-
-        layout.addLayout(sep_row)
-
-        for w in (csv_btn, self.csv_label, out_btn, self.out_label, start_btn):
             layout.addWidget(w)
 
         self.setLayout(layout)
@@ -158,10 +146,8 @@ class CSVFolderGeneratorApp(QWidget):
         return btn
 
     def _separator(self):
-        """Return the actual separator character from the combo selection."""
-        mapping = {"_": "_", "-": "-", ".": ".", " ": " "}
-        raw = self.sep_combo.currentText().split()[0]   # first token before spaces
-        return mapping.get(raw, "_")
+        """Default separator character."""
+        return "_"
 
     # ── Slots ─────────────────────────────────────────────────────────────────
 
@@ -248,7 +234,7 @@ class CSVFolderGeneratorApp(QWidget):
             base_path = sys._MEIPASS
         else:
             base_path = os.path.dirname(os.path.abspath(__file__))
-        cover_path = os.path.join(base_path, "static", "logo_imgs", "cover.png")
+        cover_path = os.path.join(base_path, "static", "cover.png")
         if os.path.exists(cover_path):
             pixmap = QPixmap(cover_path).scaled(600, 800)
         else:
